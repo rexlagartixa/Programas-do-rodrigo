@@ -1,0 +1,56 @@
+#include <bits/stdc++.h>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
+
+void aprofundamento(int *v, int n){
+    for(int i = 0; i <= n-1; i++){
+        int chave = v[i];
+        int j = i - 1;
+        while(j >= 0 && v[j] > chave){
+            v[j + 1] = v[j];
+            j = j - 1;
+        }
+        v[j +  1] = chave;
+    }
+}
+
+void copiar(int *v,int *vtemp, int n){
+    for(int i = 0; i < n; i++){
+        vtemp[i] = v[i];
+    }
+}
+
+void preencher(int *v, int n, int min, int max){
+    for(int i = 0; i < n; i++){
+        v[i] = min  + rand()%(max - min) + 1;
+    }
+}
+
+void mostrar(int *v, int n){
+    for(int i = 0; i < n; i++)
+        printf("%d ", v[i]);
+    printf("\n \n \n");
+}
+
+
+int main(){
+    int n = 1000000;
+    int vet[n];
+    int vtemp[n];
+    srand(time(NULL));
+
+    preencher(vet, n, 0, 100);
+    copiar(vet, vtemp, n);
+
+    for(int i = 0; i < n; i=i+25000){
+        auto inicio = steady_clock::now();
+        aprofundamento(vet, i);
+        copiar(vtemp, vet, n); //Faz o vetor voltar a ser desordenado(original)
+        auto fim = steady_clock::now();
+        auto intervalo = fim - inicio;
+        cout << duration_cast<seconds>(intervalo).count() << "s" << " "<< i << endl;
+    }
+
+}
