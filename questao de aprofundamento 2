@@ -1,0 +1,178 @@
+#include <bits/stdc++.h>
+#include <chrono>
+
+#define RED "\x1b[31m"
+#define GREEN "\x1b[32m"
+#define RESET "\x1b[m"
+
+using namespace std;
+using namespace std::chrono;
+
+void exibir(int *v, int n);
+void heapify(int *v, int n, int idx);
+void heapsort(int *v, int n);
+void maxheap(int *v, int n);
+bool ordem(int *v, int n);
+void preencher(int *v, int n);
+void trocar(int *a, int *b);
+void exibir_parte_ordenada(int *v, int n);
+void copiar(int *v,int *vtemp, int n);
+void exibir_parte_nao_ordenada(int *v, int j, int n);
+
+int main(int argc, char* args[]) {
+    
+    int N = 100000;
+    int v[N];
+    int vtemp[N];
+    
+
+    
+    preencher(v, N);
+    
+//-------------------------------------------------------------------------------------------------------------------//
+    //-------------------------------------------------------------------------------------------------------------------//
+        //-----------------------------------------gerando os arquivos para fazer os graficos--------------------------------//
+
+    ofstream arquivo;
+    arquivo.open("dados_heapsort.txt");//, ios::app);
+    
+    if(arquivo.is_open()){
+        arquivo <<" Tempo de execução heapsort X tamanho do vetor:" <<"\n"  << endl;
+        for(int i = 0; i < N; i=i+25000){
+            auto inicio = steady_clock::now();
+            heapsort(v, i);
+            auto fim = steady_clock::now();
+            auto intervalo = fim - inicio;
+            arquivo << duration_cast<milliseconds>(intervalo).count() << "ms " << i << endl;
+        }
+        arquivo.close();
+    }
+
+    arquivo.open("dados_maxheap.txt");
+    if(arquivo.is_open()){
+        arquivo <<" Tempo de execução maxheap X tamanho do vetor:" <<"\n"  << endl;
+        for(int i = 0; i < N; i=i+25000){
+            auto inicio = steady_clock::now();
+            maxheap(v, i);
+            auto fim = steady_clock::now();
+            auto intervalo = fim - inicio;
+            arquivo << duration_cast<microseconds>(intervalo).count() << "us " << i <<endl;
+        }
+        arquivo.close();
+    }
+    
+    arquivo.open("dados_heapify.txt");
+        if(arquivo.is_open()){
+        arquivo <<" Tempo de execução heapify X tamanho do vetor:" <<"\n"  << endl;
+        for(int i = 0; i < N; i=i+25000){
+            auto inicio = steady_clock::now();
+            heapify(v, i, 0);
+            auto fim = steady_clock::now();
+            auto intervalo = fim - inicio;
+            arquivo << duration_cast<nanoseconds>(intervalo).count() << "ns " << i << endl;
+        }
+        arquivo.close();
+    }
+
+//-------------------------------------------------------------------------------------------------------------------// 
+    //---------------------------------------------------letra c)----------------------------------------------------------------//
+    exibir(v, N);
+    copiar(v, vtemp, N);
+    
+    
+    for(int i = 0; i < N; i=i+5){
+        heapsort(v, i);
+        exibir_parte_ordenada(v, i);
+        exibir_parte_nao_ordenada(v, i, N);
+        cout << "\n\n";
+        copiar(vtemp, v, N);
+    }
+    
+    
+
+
+    return 0;
+}
+
+void exibir_parte_ordenada(int *v, int n) {
+    for(int i = 0; i <= n; i++){
+        cout << GREEN << v[i] << " ";
+        cout << RESET;
+    }
+}
+
+void exibir_parte_nao_ordenada(int *v, int j, int n) {
+    for(int i = j; i <= n; i++){
+        cout << RED << v[i] << " ";
+        cout << RESET;
+    }
+}
+
+void copiar(int *v,int *vtemp, int n){
+    for(int i = 0; i < n; i++){
+        vtemp[i] = v[i];
+    }
+}
+
+void exibir(int *v, int n) {
+    for(int i = 0; i < n; i++){
+        cout<< v[i] <<" ";
+        
+    }
+    cout << "\n\n";
+}
+
+void heapify(int *v, int n, int idx) {
+    int esq, dir;
+    int maior = idx;
+    bool troca = true;
+    while(troca) {
+        troca = false;
+        esq = 2*maior + 1;
+        dir = 2*maior + 2;
+        if(esq < n && v[maior] < v[esq])
+            maior = esq;
+        if(dir < n && v[maior] < v[dir])
+            maior = dir;
+        if(maior != idx) {
+            trocar(&v[maior], &v[idx]);
+            troca = true;
+            idx = maior;
+        }
+    }
+}
+
+void heapsort(int *v, int n) {
+    maxheap(v, n);
+    while(n > 0) {
+        trocar(&v[0], &v[n-1]);
+        n--;
+        heapify(v, n, 0);
+    }
+}
+
+void maxheap(int *v, int n) {
+    for(int idx = n/2-1; idx >= 0; idx--)
+        heapify(v, n, idx);
+}
+
+bool ordem(int *v, int n) {
+    for(int i = 1; i < n; i++){
+        if(v[i-1] > v[i]){
+            return false;
+        }
+    }
+    return true;
+}
+
+void preencher(int *v, int n) {
+    srand(time(NULL));
+    for(int i = 0; i < n; i++)
+        v[i] = 1 + rand()%100;
+}
+
+void trocar(int *a, int *b) {
+    int aux = *a;
+    *a = *b;
+    *b = aux;
+}
