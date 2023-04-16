@@ -40,17 +40,21 @@ int main(){
     int vet[n];
     int vtemp[n];
     srand(time(NULL));
-
+    
+    
     preencher(vet, n, 0, 100);
     copiar(vet, vtemp, n);
 
+    ofstream arquivo;
+    arquivo.open("saida.txt");
+    
     for(int i = 0; i < n; i=i+25000){
         auto inicio = steady_clock::now();
         aprofundamento(vet, i);
         copiar(vtemp, vet, n); //Faz o vetor voltar a ser desordenado(original)
         auto fim = steady_clock::now();
         auto intervalo = fim - inicio;
-        cout << duration_cast<seconds>(intervalo).count() << "s" << " "<< i << endl;
+        arquivo << duration_cast<seconds>(intervalo).count() << "s" << " "<< i << endl;
     }
 
 }
